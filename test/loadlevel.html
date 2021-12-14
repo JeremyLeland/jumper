@@ -5,9 +5,56 @@
 
 <script type="module">
 
-  import { ThreeGame } from '../src/ThreeGame.js';
+  import { THREE, ThreeGame } from '../src/ThreeGame.js';
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color( 0x111122 );
+
+  const light = new THREE.DirectionalLight( 0xffffff );
+  light.position.set( 0, 1, 0.5 );
+  light.target.position.set( 0, 0, 0 );
+  scene.add( light );
 
   const game = new ThreeGame();
+
+  game.scene = scene;
+  game.camera.position.set( 4.5, 1, 5 );
+
+  const positions = [];
+  const colors = [];
+  const indices = [];
+  
+  const rows = 3, cols = 9;
+  let index = 0;
+  for ( let row = 0; row < rows - 1; row ++ ) {
+    for ( let col = 0; col < cols - 1; col ++ ) {
+      const color = new THREE.Color();
+      color.setHSL( Math.random() * 360, 0.5, 0.5 );
+      positions.push( col + 1, 0, row     );  colors.push( color.r, color.g, color.b );
+      positions.push( col,     0, row     );  colors.push( color.r, color.g, color.b );
+      positions.push( col + 1, 0, row + 1 );  colors.push( color.r, color.g, color.b );
+      positions.push( col,     0, row + 1 );  colors.push( color.r, color.g, color.b );
+      indices.push( index,     index + 1, index + 2 );
+      indices.push( index + 2, index + 1, index + 3 );
+      index += 4;
+    }
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+  geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+  geometry.setIndex( indices );
+
+  const material = new THREE.MeshPhongMaterial( {
+    color: 0xffffff,
+    flatShading: true,
+    vertexColors: true,
+    shininess: 0
+  } );
+
+  const mesh = new THREE.Mesh( geometry, material );
+  scene.add( mesh );
+
   game.update = ( dt ) => {
   }
 

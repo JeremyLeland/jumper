@@ -1,21 +1,22 @@
 import * as THREE from '../lib/three.module.js';
+export * as THREE from '../lib/three.module.js';
 
-export class ThreeDemo {
+export class ThreeGame {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );  
-  renderer = new THREE.WebGLRenderer();
   
   constructor() {
-    document.body.appendChild( this.renderer.domElement );
+    const renderer = new THREE.WebGLRenderer();
+    document.body.appendChild( renderer.domElement );
 
     window.onresize = () => {
       this.camera.aspect = window.innerWidth / window.innerHeight;
       this.camera.updateProjectionMatrix();
 
-      this.renderer.setSize(window.innerWidth, window.innerHeight);
-      this.render();
+      renderer.setSize(window.innerWidth, window.innerHeight);
     }
     window.onresize();
+    
     
     let lastTime = null;
     const animate = ( now ) => {
@@ -23,7 +24,7 @@ export class ThreeDemo {
       this.update( now - lastTime );
       lastTime = now;
   
-      this.renderer.render( this.scene, this.camera );
+      renderer.render( this.scene, this.camera );
   
       requestAnimationFrame( animate );
     };
