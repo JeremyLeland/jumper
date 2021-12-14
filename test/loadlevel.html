@@ -26,17 +26,23 @@
   
   const rows = 3, cols = 9;
   let index = 0;
-  for ( let row = 0; row < rows - 1; row ++ ) {
-    for ( let col = 0; col < cols - 1; col ++ ) {
-      const color = new THREE.Color();
-      color.setHSL( Math.random() * 360, 0.5, 0.5 );
-      positions.push( col + 1, 0, row     );  colors.push( color.r, color.g, color.b );
-      positions.push( col,     0, row     );  colors.push( color.r, color.g, color.b );
-      positions.push( col + 1, 0, row + 1 );  colors.push( color.r, color.g, color.b );
-      positions.push( col,     0, row + 1 );  colors.push( color.r, color.g, color.b );
+  for ( let row = 0; row < rows; row ++ ) {
+    for ( let col = 0; col < cols; col ++ ) {
+      [ 0, 1 ].forEach( z => {
+        [ 1, 0 ].forEach( x => {
+          positions.push( col + x, 0, row + z);
+        } );
+      });
+
       indices.push( index,     index + 1, index + 2 );
       indices.push( index + 2, index + 1, index + 3 );
       index += 4;
+
+      const color = new THREE.Color();
+      color.setHSL( Math.random() * 360, 0.5, 0.5 );
+      for ( let i = 0; i < 4; i ++ ) {
+        colors.push( color.r, color.g, color.b );
+      }
     }
   }
 
