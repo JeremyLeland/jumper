@@ -13,29 +13,38 @@
   import { Level } from '../src/Level.js';
 
   const LEVEL_COLS = 9;
-  const BLOCK_WIDTH = 0.5, BLOCK_HEIGHT = 0.5, BLOCK_LENGTH = 1;
+  const BLOCK_WIDTH = 1, BLOCK_HEIGHT = 0.5, BLOCK_LENGTH = 2;
 
   const CAMERA_X = LEVEL_COLS * BLOCK_WIDTH / 2;
   const CAMERA_Y = 3;
   const CAMERA_FOLLOW_Z = 4;
   const CAMERA_LOOK_Z = -3;
 
+  const PLAYER_SIZE = 0.4;
+
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color( 0x111122 );
 
   const light = new THREE.DirectionalLight( 0xffffff );
   light.position.set( 0, 1, 0.5 );
   light.target.position.set( 0, 0, 0 );
   scene.add( light );
 
+  const player = new THREE.Mesh(
+    new THREE.SphereGeometry( PLAYER_SIZE, 20, 20 ),
+    new THREE.MeshPhongMaterial( {
+      color: 0xffffff, 
+      transparent: true, 
+      opacity: 0.8
+    } )
+  );
+  scene.add( player );
+  
   const game = new ThreeGame();
   game.scene = scene;
 
-  let player = {
-    position: new THREE.Vector3()
-  }
-  
   let level;
+  loadLevel( './levels/classic/03.png' );
+
   async function loadLevel( src ) {
     if ( level ) {
       scene.remove( level.mesh );
@@ -48,7 +57,8 @@
     level.mesh.scale.set( BLOCK_WIDTH, BLOCK_HEIGHT, BLOCK_LENGTH );
     scene.add( level.mesh );
 
-    player.position.set( ( level.cols / 2 ) * BLOCK_WIDTH, 1, ( level.rows - 0.5 ) * BLOCK_LENGTH );
+    // TODO: Spawn higher so we fall from off screen
+    player.position.set( ( level.cols / 2 ) * BLOCK_WIDTH, PLAYER_SIZE, ( level.rows - 0.5 ) * BLOCK_LENGTH );
 
     game.camera.position.set( CAMERA_X, CAMERA_Y, player.position.z + CAMERA_FOLLOW_Z );
     game.camera.lookAt( player.position.x, 0, player.position.z + CAMERA_LOOK_Z );
