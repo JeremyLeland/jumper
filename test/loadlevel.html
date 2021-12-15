@@ -11,8 +11,6 @@
 
   const BLOCK_WIDTH = 0.5, BLOCK_HEIGHT = 0.5, BLOCK_LENGTH = 1;
 
-  const level = await Level.fromImageSrc( '../levels/classic/ant-thing.png' );
-
   const scene = new THREE.Scene();
   scene.background = new THREE.Color( 0x111122 );
 
@@ -20,17 +18,49 @@
   light.position.set( 0, 1, 0.5 );
   light.target.position.set( 0, 0, 0 );
   scene.add( light );
-  
-  level.mesh.scale.set( BLOCK_WIDTH, BLOCK_HEIGHT, BLOCK_LENGTH );
-  scene.add( level.mesh );
-
 
   const game = new ThreeGame();
-
   game.scene = scene;
-  game.camera.position.set( level.cols * BLOCK_WIDTH / 2, 1, level.rows * BLOCK_LENGTH + 2 );
+  
+  let level;
+  async function loadLevel( src ) {
+    if ( level ) {
+      scene.remove( level.mesh );
+      level.mesh.geometry.dispose();
+      level.mesh.material.dispose();
+    }
+    
+    level = await Level.fromImageSrc( src );
+  
+    level.mesh.scale.set( BLOCK_WIDTH, BLOCK_HEIGHT, BLOCK_LENGTH );
+    scene.add( level.mesh );
 
-  game.update = ( dt ) => {
+    game.camera.position.set( level.cols * BLOCK_WIDTH / 2, 1, level.rows * BLOCK_LENGTH + 2 );
+  }
+
+  window.ondragover = ( event ) => {
+    event.preventDefault();
+  }
+  window.ondrop = ( event ) => {
+    event.preventDefault();
+
+    if ( event.dataTransfer.items ) {
+      for ( let i = 0; i < event.dataTransfer.items.length; i ++ ) {
+        if ( event.dataTransfer.items[ i ].kind === 'file' ) {
+          const file = event.dataTransfer.items[ i ].getAsFile();
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            loadLevel( reader.result );
+          };
+          reader.readAsDataURL( file );
+        }
+      }
+    }
+    else {
+      for ( let i = 0; i < event.dataTransfer.files.length; i ++ ) {
+        loadLevel( event.dataTransfer.files[ i ].name );
+      }
+    }
   }
 
 </script>

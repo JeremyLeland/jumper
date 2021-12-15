@@ -25,7 +25,7 @@ export class ThreeGame {
   
       renderer.render( this.scene, this.camera );
   
-      //requestAnimationFrame( animate );
+      requestAnimationFrame( animate );
     };
 
     requestAnimationFrame( animate );
