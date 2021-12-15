@@ -1,7 +1,5 @@
 import * as THREE from '../lib/three.module.js';
 
-
-
 export class Level {
   cols;
   rows;
@@ -22,8 +20,7 @@ export class Level {
     this.rows = image.height;
 
     this.blocks = Array.from( getImageDataBuffer( image ), 
-      // TODO: null for black as well as transparent
-      color => color == 0 ? null : new THREE.Color( color ) 
+      color => ( color & 0x00FFFFFF ) == 0 ? null : new THREE.Color( color ) 
     );
 
     this.mesh = getMesh( this.cols, this.rows, this.blocks );
