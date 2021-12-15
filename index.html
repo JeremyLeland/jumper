@@ -19,10 +19,14 @@
   const CAMERA_FOLLOW_Z = 4;
   const CAMERA_LOOK_Z = -3;
 
+  const LIGHT_X = CAMERA_X;
+  const LIGHT_Y = 10;
+  const LIGHT_FOLLOW_Z = 5;
+
   const PLAYER_SIZE = 0.4;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color( 0x11122 ); 
+  // scene.background = new THREE.Color( 0x11122 ); 
 
   const light = new THREE.DirectionalLight( 0xffffff );
 
@@ -41,10 +45,10 @@
   // light.shadow.camera.near = dLight / 30;
   // light.shadow.camera.far = dLight;
 
-  // light.shadow.mapSize.width = 1024 * 2;
-  // light.shadow.mapSize.height = 1024 * 2;
+  light.shadow.mapSize.width = 1024 * 2;
+  light.shadow.mapSize.height = 1024 * 2;
 
-  light.shadow.camera.visible = true;
+  // light.shadow.camera.visible = true;
 
   // scene.add(new THREE.CameraHelper(light.shadow.camera));
   //
@@ -89,8 +93,8 @@
     // TODO: Spawn higher so we fall from off screen
     player.position.set( ( level.cols / 2 ) * Level.BLOCK_WIDTH, PLAYER_SIZE, ( level.rows - 0.5 ) * Level.BLOCK_LENGTH );
 
-    light.position.set( 0, 5, player.position.z );
-    light.target.position.set( 0, 0, player.position.z );
+    light.position.set( LIGHT_X, LIGHT_Y, player.position.z + LIGHT_FOLLOW_Z );
+    light.target.position.set( LIGHT_X, 0, player.position.z );
 
     game.camera.position.set( CAMERA_X, CAMERA_Y, player.position.z + CAMERA_FOLLOW_Z );
     game.camera.lookAt( player.position.x, 0, player.position.z + CAMERA_LOOK_Z );
