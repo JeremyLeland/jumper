@@ -13,7 +13,7 @@ export class ThreeGame {
       this.camera.aspect = window.innerWidth / window.innerHeight;
       this.camera.updateProjectionMatrix();
 
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize( window.innerWidth, window.innerHeight );
     }
     window.onresize();
     
@@ -26,7 +26,7 @@ export class ThreeGame {
   
       renderer.render( this.scene, this.camera );
   
-      requestAnimationFrame( animate );
+      //requestAnimationFrame( animate );
     };
 
     requestAnimationFrame( animate );
