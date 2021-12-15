@@ -24,6 +24,10 @@
     ctx.getImageData( 0, 0, canvas.width, canvas.height ).data.buffer
   );
 
+  const blocks = Array.from( pixelBuffer, 
+    color => color == 0 ? null : new THREE.Color( color ) 
+  );
+
   const positions = [];
   const colors = [];
   const indices = [];
@@ -32,15 +36,24 @@
   let index = 0;
   for ( let row = 0; row < rows; row ++ ) {
     for ( let col = 0; col < cols; col ++ ) {
-      [ 0, 1 ].forEach( z => {
-        [ 1, 0 ].forEach( x => {
-          positions.push( col + x, 0, row + z);
-        } );
-      });
+      const block = blocks[ col + row * cols ];
 
-      indices.push( index,     index + 1, index + 2 );
-      indices.push( index + 2, index + 1, index + 3 );
-      index += 4;
+      if ( block ) {
+        // Top
+        [ 0, 1 ].forEach( z => {
+          [ 1, 0 ].forEach( x => {
+            positions.push( col + x, 0, row + z);
+          } );
+        });
+  
+        indices.push( index,     index + 1, index + 2 );
+        indices.push( index + 2, index + 1, index + 3 );
+        index += 4;
+
+        for ( let i = 0; i < 4; i ++ ) {
+          colors.push( block.b, block.g, block.r );   // colors are backwards for some reason
+        }
+      }
     }
   }
 
@@ -49,9 +62,7 @@
     const g = ( ( color >> 8 ) & 0xFF ) / 255; 
     const b = ( ( color >> 16 ) & 0xFF ) / 255;
 
-    for ( let i = 0; i < 4; i ++ ) {
-      colors.push( r, g, b );
-    }
+    
   } );
   
   const geometry = new THREE.BufferGeometry();
