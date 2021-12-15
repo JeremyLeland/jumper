@@ -1,6 +1,10 @@
 import * as THREE from '../lib/three.module.js';
 
 export class Level {
+  static BLOCK_WIDTH = 1;
+  static BLOCK_HEIGHT = 0.5;
+  static BLOCK_LENGTH = 2;
+
   cols;
   rows;
   blocks;
@@ -24,11 +28,16 @@ export class Level {
     );
 
     this.mesh = getMesh( this.cols, this.rows, this.blocks );
+    this.mesh.scale.set( Level.BLOCK_WIDTH, Level.BLOCK_HEIGHT, Level.BLOCK_LENGTH );
+
+    this.mesh.castShadow = false;
+    this.mesh.receiveShadow = true;
   }
 }
 
 function getMesh( cols, rows, blocks ) {
   const positions = [];
+  const normals = [];
   const colors = [];
   const indices = [];
   
@@ -51,7 +60,8 @@ function getMesh( cols, rows, blocks ) {
         // Top
         [ 0, 1 ].forEach( z => {
           [ 1, 0 ].forEach( x => {
-            positions.push( col + x, 0, row + z);
+            positions.push( col + x, 0, row + z );
+            normals.push( 0, 1, 0 );
           } );
         });
   
@@ -61,7 +71,8 @@ function getMesh( cols, rows, blocks ) {
         if ( row == rows - 1 || !blocks[ col + ( row + 1 ) * cols ] ) {
           [ 0, -1 ].forEach( y => {
             [ 1, 0 ].forEach( x => {
-              positions.push( col + x, y, row + 1);
+              positions.push( col + x, y, row + 1 );
+              normals.push( 0, 0, 1 );
             } );
           });
     
@@ -72,7 +83,8 @@ function getMesh( cols, rows, blocks ) {
         if ( col > ( cols / 2 ) && !blocks[ col - 1 + row * cols ] ) {
           [ 0, -1 ].forEach( y => {
             [ 1, 0 ].forEach( z => {
-              positions.push( col, y, row + z);
+              positions.push( col, y, row + z );
+              normals.push( -1, 0, 0 );
             } );
           });
     
@@ -83,7 +95,8 @@ function getMesh( cols, rows, blocks ) {
         if ( col < ( cols / 2 ) && !blocks[ col + 1 + row * cols ] ) {
           [ 0, -1 ].forEach( y => {
             [ 0, 1 ].forEach( z => {
-              positions.push( col + 1, y, row + z);
+              positions.push( col + 1, y, row + z );
+              normals.push( 1, 0, 0 );
             } );
           });
     
@@ -95,10 +108,12 @@ function getMesh( cols, rows, blocks ) {
 
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+  geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
   geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
   geometry.setIndex( indices );
 
   const material = new THREE.MeshPhongMaterial( {
+    //color: 0xC7C7C7,
     flatShading: true,
     vertexColors: true,
   } );

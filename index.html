@@ -13,9 +13,8 @@
   import { Level } from '../src/Level.js';
 
   const LEVEL_COLS = 9;
-  const BLOCK_WIDTH = 1, BLOCK_HEIGHT = 0.5, BLOCK_LENGTH = 2;
 
-  const CAMERA_X = LEVEL_COLS * BLOCK_WIDTH / 2;
+  const CAMERA_X = LEVEL_COLS * Level.BLOCK_WIDTH / 2;
   const CAMERA_Y = 3;
   const CAMERA_FOLLOW_Z = 4;
   const CAMERA_LOOK_Z = -3;
@@ -23,11 +22,37 @@
   const PLAYER_SIZE = 0.4;
 
   const scene = new THREE.Scene();
+  scene.background = new THREE.Color( 0x11122 ); 
 
   const light = new THREE.DirectionalLight( 0xffffff );
-  light.position.set( 0, 1, 0.5 );
-  light.target.position.set( 0, 0, 0 );
+
+  //
+  // TODO: Figure out how this works, tune as needed
+  //
+  light.castShadow = true;
+
+  // const dLight = 200;
+  // const sLight = dLight * 0.25;
+  // light.shadow.camera.left = - sLight;
+  // light.shadow.camera.right = sLight;
+  // light.shadow.camera.top = sLight;
+  // light.shadow.camera.bottom = - sLight;
+
+  // light.shadow.camera.near = dLight / 30;
+  // light.shadow.camera.far = dLight;
+
+  // light.shadow.mapSize.width = 1024 * 2;
+  // light.shadow.mapSize.height = 1024 * 2;
+
+  light.shadow.camera.visible = true;
+
+  // scene.add(new THREE.CameraHelper(light.shadow.camera));
+  //
+  //
+  //
+
   scene.add( light );
+  scene.add( light.target );
 
   const player = new THREE.Mesh(
     new THREE.SphereGeometry( PLAYER_SIZE, 20, 20 ),
@@ -37,9 +62,13 @@
       opacity: 0.8
     } )
   );
+  player.castShadow = true;
+  player.receiveShadow = false;
   scene.add( player );
   
   const game = new ThreeGame();
+  game.renderer.shadowMap.enabled = true;
+  game.renderer.shadowMap.soft = true;
   game.scene = scene;
 
   let level;
@@ -54,11 +83,14 @@
     
     level = await Level.fromImageSrc( src );
   
-    level.mesh.scale.set( BLOCK_WIDTH, BLOCK_HEIGHT, BLOCK_LENGTH );
+    
     scene.add( level.mesh );
 
     // TODO: Spawn higher so we fall from off screen
-    player.position.set( ( level.cols / 2 ) * BLOCK_WIDTH, PLAYER_SIZE, ( level.rows - 0.5 ) * BLOCK_LENGTH );
+    player.position.set( ( level.cols / 2 ) * Level.BLOCK_WIDTH, PLAYER_SIZE, ( level.rows - 0.5 ) * Level.BLOCK_LENGTH );
+
+    light.position.set( 0, 5, player.position.z );
+    light.target.position.set( 0, 0, player.position.z );
 
     game.camera.position.set( CAMERA_X, CAMERA_Y, player.position.z + CAMERA_FOLLOW_Z );
     game.camera.lookAt( player.position.x, 0, player.position.z + CAMERA_LOOK_Z );
