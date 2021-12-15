@@ -1,5 +1,4 @@
 import * as THREE from '../lib/three.module.js';
-export * as THREE from '../lib/three.module.js';
 
 export class ThreeGame {
   scene = new THREE.Scene();
