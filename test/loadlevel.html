@@ -9,7 +9,7 @@
 
   
   const image = new Image();
-  image.src = '../levels/classic/fruit.png';
+  image.src = '../levels/classic/ant-thing.png';
 
   await image.decode();
 
@@ -52,6 +52,57 @@
 
         for ( let i = 0; i < 4; i ++ ) {
           colors.push( block.b, block.g, block.r );   // colors are backwards for some reason
+        }
+
+        // Front
+        if ( row == rows - 1 || !blocks[ col + ( row + 1 ) * cols ] ) {
+          [ 0, -1 ].forEach( y => {
+            [ 1, 0 ].forEach( x => {
+              positions.push( col + x, y, row + 1);
+            } );
+          });
+    
+          indices.push( index,     index + 1, index + 2 );
+          indices.push( index + 2, index + 1, index + 3 );
+          index += 4;
+
+          for ( let i = 0; i < 4; i ++ ) {
+            colors.push( block.b, block.g, block.r );   // colors are backwards for some reason
+          }
+        }
+
+        // Left
+        if ( col > ( cols / 2 ) && !blocks[ col - 1 + row * cols ] ) {
+          [ 0, -1 ].forEach( y => {
+            [ 1, 0 ].forEach( z => {
+              positions.push( col, y, row + z);
+            } );
+          });
+    
+          indices.push( index,     index + 1, index + 2 );
+          indices.push( index + 2, index + 1, index + 3 );
+          index += 4;
+
+          for ( let i = 0; i < 4; i ++ ) {
+            colors.push( block.b, block.g, block.r );   // colors are backwards for some reason
+          }
+        }
+
+        // Right
+        if ( col < ( cols / 2 ) && !blocks[ col + 1 + row * cols ] ) {
+          [ 0, -1 ].forEach( y => {
+            [ 0, 1 ].forEach( z => {
+              positions.push( col + 1, y, row + z);
+            } );
+          });
+    
+          indices.push( index,     index + 1, index + 2 );
+          indices.push( index + 2, index + 1, index + 3 );
+          index += 4;
+
+          for ( let i = 0; i < 4; i ++ ) {
+            colors.push( block.b, block.g, block.r );   // colors are backwards for some reason
+          }
         }
       }
     }
