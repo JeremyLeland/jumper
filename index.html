@@ -1,0 +1,86 @@
+<head>
+  <title>Jumper</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+</body>
+
+<script type="module">
+
+  import * as THREE from '../lib/three.module.js';
+  import { ThreeGame } from '../src/ThreeGame.js';
+  import { Level } from '../src/Level.js';
+
+  const LEVEL_COLS = 9;
+  const BLOCK_WIDTH = 0.5, BLOCK_HEIGHT = 0.5, BLOCK_LENGTH = 1;
+
+  const CAMERA_X = LEVEL_COLS * BLOCK_WIDTH / 2;
+  const CAMERA_Y = 3;
+  const CAMERA_FOLLOW_Z = 4;
+  const CAMERA_LOOK_Z = -3;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color( 0x111122 );
+
+  const light = new THREE.DirectionalLight( 0xffffff );
+  light.position.set( 0, 1, 0.5 );
+  light.target.position.set( 0, 0, 0 );
+  scene.add( light );
+
+  const game = new ThreeGame();
+  game.scene = scene;
+
+  let player = {
+    position: new THREE.Vector3()
+  }
+  
+  let level;
+  async function loadLevel( src ) {
+    if ( level ) {
+      scene.remove( level.mesh );
+      level.mesh.geometry.dispose();
+      level.mesh.material.dispose();
+    }
+    
+    level = await Level.fromImageSrc( src );
+  
+    level.mesh.scale.set( BLOCK_WIDTH, BLOCK_HEIGHT, BLOCK_LENGTH );
+    scene.add( level.mesh );
+
+    player.position.set( ( level.cols / 2 ) * BLOCK_WIDTH, 1, ( level.rows - 0.5 ) * BLOCK_LENGTH );
+
+    game.camera.position.set( CAMERA_X, CAMERA_Y, player.position.z + CAMERA_FOLLOW_Z );
+    game.camera.lookAt( player.position.x, 0, player.position.z + CAMERA_LOOK_Z );
+
+  }
+
+  //
+  // Drag and drop to load levels
+  //
+  window.ondragover = ( event ) => {
+    event.preventDefault();
+  }
+  window.ondrop = ( event ) => {
+    event.preventDefault();
+
+    if ( event.dataTransfer.items ) {
+      for ( let i = 0; i < event.dataTransfer.items.length; i ++ ) {
+        if ( event.dataTransfer.items[ i ].kind === 'file' ) {
+          const file = event.dataTransfer.items[ i ].getAsFile();
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            loadLevel( reader.result );
+          };
+          reader.readAsDataURL( file );
+        }
+      }
+    }
+    else {
+      for ( let i = 0; i < event.dataTransfer.files.length; i ++ ) {
+        loadLevel( event.dataTransfer.files[ i ].name );
+      }
+    }
+  }
+
+</script>
