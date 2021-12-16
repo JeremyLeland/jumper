@@ -4,6 +4,8 @@ export class ThreeGame {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 500 );
   renderer = new THREE.WebGLRenderer();
+
+  keysPressed = new Set();
   
   constructor() {
     document.body.appendChild( this.renderer.domElement );
@@ -15,7 +17,9 @@ export class ThreeGame {
       this.renderer.setSize( window.innerWidth, window.innerHeight );
     }
     window.onresize();
-    
+
+    window.onkeydown = ( e ) => this.keysPressed.add( e.code );
+    window.onkeyup   = ( e ) => this.keysPressed.delete( e.code );
     
     let lastTime = null;
     const animate = ( now ) => {
