@@ -16,12 +16,10 @@
 
   const LEVEL_COLS = 9;
 
-  const CAMERA_X = LEVEL_COLS * Level.BLOCK_WIDTH / 2;
   const CAMERA_Y = 3;
   const CAMERA_FOLLOW_Z = 4;
   const CAMERA_LOOK_Z = -3;
 
-  const LIGHT_X = CAMERA_X;
   const LIGHT_Y = 10;
   const LIGHT_FOLLOW_Z = 5;
 
@@ -66,7 +64,7 @@
   game.scene = scene;
 
   let level;
-  loadLevel( './levels/classic/03.png' );
+  await loadLevel( './levels/classic/03.png' );
 
   async function loadLevel( src ) {
     if ( level ) {
@@ -80,28 +78,26 @@
     scene.add( level.mesh );
 
     player.spawn( level );
+
+    light.position.x = player.position.x;
+    light.position.y = LIGHT_Y;
+
+    game.camera.position.x = player.position.x;
+    game.camera.position.y = CAMERA_Y;
   }
 
   const speedUI = document.getElementById( 'speed' );
 
-  game.update = ( dt ) => {
-    player.update( dt, game.keysPressed );
+  game.start( ( dt ) => {
+    player.update( { dt: dt, level: level, keysPressed: game.keysPressed } );
     speedUI.innerText = player.speed;
 
-    light.position.set( 
-      player.position.x, 
-      LIGHT_Y, 
-      player.position.z + LIGHT_FOLLOW_Z
-    );
-    light.target.position.set( LIGHT_X, 0, player.position.z );
+    light.position.z = player.position.z + LIGHT_FOLLOW_Z;
+    light.target.position.set( light.position.x, 0, player.position.z );
 
-    game.camera.position.set( 
-      CAMERA_X, 
-      CAMERA_Y, 
-      player.position.z + CAMERA_FOLLOW_Z 
-    );
-    game.camera.lookAt( CAMERA_X, 0, player.position.z + CAMERA_LOOK_Z );
-  }
+    game.camera.position.z = player.position.z + CAMERA_FOLLOW_Z;
+    game.camera.lookAt( game.camera.position.x, 0, player.position.z + CAMERA_LOOK_Z );
+  } );
 
   //
   // Drag and drop to load levels

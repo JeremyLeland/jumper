@@ -1,7 +1,5 @@
 import * as THREE from '../lib/three.module.js';
 
-import { Level } from '../src/Level.js';
-
 const SPEED = 0.01
 const MAX_SPEED = 8
 const ACCEL = 0.006
@@ -37,15 +35,13 @@ export class Player {
   }
 
   spawn( level ) {
-    // TODO: Spawn higher so we fall from off screen
-    this.position.set(
-      ( level.cols / 2 ) * Level.BLOCK_WIDTH, 
-      SIZE, 
-      ( level.rows - 0.5 ) * Level.BLOCK_LENGTH 
-    );
+    this.position.copy( level.spawnPosition );
+    this.velocity.set( 0, 0, 0 );
+    this.speed = 0;
+    this.#partialSpeed = 0;
   }
 
-  update( dt, keysPressed ) {
+  update( { dt, level, keysPressed } ) {
     if ( keysPressed.has( 'ArrowLeft' ) ) {
       this.velocity.x = -SIDE_SPEED;
     }
@@ -55,6 +51,8 @@ export class Player {
     else {
       this.velocity.x = 0;
     }
+
+    this.velocity.y += GRAVITY * dt;
 
     if ( keysPressed.has( 'ArrowUp' ) ) {
       if ( this.#partialSpeed == 0 ) {
@@ -87,5 +85,21 @@ export class Player {
     this.velocity.z = -SPEED * this.speed;
 
     this.position.addScaledVector( this.velocity, dt );
+
+    if ( FALL_NO_RETURN < this.position.y && this.position.y < SIZE && 
+        [ -1, 1 ].some( x =>
+          [ -1, 1 ].some( z =>
+            level.isSolidAt( 
+              this.position.x + x * COLLISION_FUDGE, 
+              this.position.z + z * COLLISION_FUDGE
+            )
+          )
+        ) ) {
+      this.position.y = SIZE;
+      this.velocity.y = keysPressed.has( 'Space' ) ? JUMP_SPEED : 0;
+    }
+    else if ( this.position.y < FALL_END ) {
+      this.spawn( level );
+    }
   }
 }

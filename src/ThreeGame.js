@@ -20,11 +20,13 @@ export class ThreeGame {
 
     window.onkeydown = ( e ) => this.keysPressed.add( e.code );
     window.onkeyup   = ( e ) => this.keysPressed.delete( e.code );
-    
+  }
+
+  start( updateFunc ) {
     let lastTime = null;
     const animate = ( now ) => {
       lastTime ??= now;  // for first call only
-      this.update( now - lastTime );
+      updateFunc( now - lastTime );
       lastTime = now;
   
       this.renderer.render( this.scene, this.camera );
@@ -34,6 +36,4 @@ export class ThreeGame {
 
     requestAnimationFrame( animate );
   }
-
-  update( dt ) {}
 }

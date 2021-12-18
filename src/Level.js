@@ -1,14 +1,18 @@
 import * as THREE from '../lib/three.module.js';
 
-export class Level {
-  static BLOCK_WIDTH = 1;
-  static BLOCK_HEIGHT = 0.5;
-  static BLOCK_LENGTH = 2;
+const BLOCK_WIDTH = 1;
+const BLOCK_HEIGHT = 0.5;
+const BLOCK_LENGTH = 2;
 
+const SPAWN_Y = 5;
+
+export class Level {
   cols;
   rows;
   blocks;
   mesh;
+
+  spawnPosition;
 
   static async fromImageSrc( src ) {
     const image = new Image();
@@ -23,15 +27,28 @@ export class Level {
     this.cols = image.width;
     this.rows = image.height;
 
+    this.spawnPosition = new THREE.Vector3(
+      ( this.cols / 2 ) * BLOCK_WIDTH, 
+      SPAWN_Y, 
+      ( this.rows - 0.5 ) * BLOCK_LENGTH
+    );
+
     this.blocks = Array.from( getImageDataBuffer( image ), 
       color => ( color & 0x00FFFFFF ) == 0 ? null : new THREE.Color( color ) 
     );
 
     this.mesh = getMesh( this.cols, this.rows, this.blocks );
-    this.mesh.scale.set( Level.BLOCK_WIDTH, Level.BLOCK_HEIGHT, Level.BLOCK_LENGTH );
+    this.mesh.scale.set( BLOCK_WIDTH, BLOCK_HEIGHT, BLOCK_LENGTH );
 
     this.mesh.castShadow = false;
     this.mesh.receiveShadow = true;
+  }
+
+  isSolidAt( x, z ) {
+    const col = Math.floor( x / BLOCK_WIDTH );
+    const row = Math.floor( z / BLOCK_LENGTH );
+    return 0 <= col && col < this.cols && 0 <= row && row < this.rows &&
+      this.blocks[ col + row * this.cols ];
   }
 }
 
