@@ -11,6 +11,7 @@
   import * as THREE from '../lib/three.module.js';
   import { ThreeGame } from '../src/ThreeGame.js';
   import { Level } from '../src/Level.js';
+  import { Player } from '../src/Player.js';
 
   const LEVEL_COLS = 9;
 
@@ -22,12 +23,6 @@
   const LIGHT_X = CAMERA_X;
   const LIGHT_Y = 10;
   const LIGHT_FOLLOW_Z = 5;
-
-  const PLAYER_SIDE_SPEED = 0.008;
-  const PLAYER_SIZE = 0.4;
-  const PLAYER_SPEED = 0.01;
-  const PLAYER_MAX_SPEED = 8;
-  const PLAYER_ACCEL = 0.006;
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color( 0x111122 ); 
@@ -62,26 +57,11 @@
   scene.add( light );
   scene.add( light.target );
 
-  const player = new THREE.Mesh(
-    new THREE.SphereGeometry( PLAYER_SIZE, 20, 20 ),
-    new THREE.MeshPhongMaterial( {
-      color: 0xffffff, 
-      transparent: true, 
-      opacity: 0.8
-    } )
-  );
-  player.velocity = new THREE.Vector3();
-  player.partialSpeed = 0;
-  player.dSpeed = 0;
-  player.speed = 0;
-
-  player.castShadow = true;
-  player.receiveShadow = false;
-  scene.add( player );
+  const player = new Player();;
+  scene.add( player.mesh );
   
   const game = new ThreeGame();
   game.renderer.shadowMap.enabled = true;
-  game.renderer.shadowMap.soft = true;
   game.scene = scene;
 
   let level;
@@ -96,60 +76,26 @@
     
     level = await Level.fromImageSrc( src );
   
-    
     scene.add( level.mesh );
 
-    // TODO: Spawn higher so we fall from off screen
-    player.position.set( ( level.cols / 2 ) * Level.BLOCK_WIDTH, PLAYER_SIZE, ( level.rows - 0.5 ) * Level.BLOCK_LENGTH );
+    player.spawn( level );
   }
 
   game.update = ( dt ) => {
-    if ( game.keysPressed.has( 'ArrowLeft' ) ) {
-      player.velocity.x = -PLAYER_SIDE_SPEED;
-    }
-    else if ( game.keysPressed.has( 'ArrowRight' ) ) {
-      player.velocity.x = PLAYER_SIDE_SPEED;
-    }
-    else {
-      player.velocity.x = 0;
-    }
+    player.update( dt, game.keysPressed );
 
-    if ( game.keysPressed.has( 'ArrowUp' ) ) {
-      if ( player.dSpeed == 0 ) {
-        player.speed = Math.min( player.speed + 1, PLAYER_MAX_SPEED );
-      }
-
-      player.dSpeed = PLAYER_ACCEL;
-    }
-    else if ( game.keysPressed.has( 'ArrowDown' ) ) {
-      if ( player.dSpeed == 0 ) {
-        player.speed = Math.max( 0, player.speed - 1 );
-      }
-      player.dSpeed = -PLAYER_ACCEL;
-    }
-    else {
-      player.dSpeed = 0;
-    }
-
-    player.partialSpeed += player.dSpeed * dt
-
-    if (player.partialSpeed > 1) {
-      player.speed = Math.min( player.speed + 1, PLAYER_MAX_SPEED );
-      player.partialSpeed -= 1;
-    }
-    else if (player.partialSpeed < -1) {
-      player.speed = Math.max( 0, player.speed - 1 );
-      player.partialSpeed += 1;
-    }
-
-    player.velocity.z = -PLAYER_SPEED * player.speed;
-
-    player.position.addScaledVector( player.velocity, dt );
-
-    light.position.set( player.position.x, LIGHT_Y, player.position.z + LIGHT_FOLLOW_Z );
+    light.position.set( 
+      player.position.x, 
+      LIGHT_Y, 
+      player.position.z + LIGHT_FOLLOW_Z
+    );
     light.target.position.set( LIGHT_X, 0, player.position.z );
 
-    game.camera.position.set( CAMERA_X, CAMERA_Y, player.position.z + CAMERA_FOLLOW_Z );
+    game.camera.position.set( 
+      CAMERA_X, 
+      CAMERA_Y, 
+      player.position.z + CAMERA_FOLLOW_Z 
+    );
     game.camera.lookAt( CAMERA_X, 0, player.position.z + CAMERA_LOOK_Z );
   }
 
