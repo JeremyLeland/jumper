@@ -1,9 +1,10 @@
 <head>
-  <title>Jumper</title>
+  <title>Jumper v0.9</title>
   <link rel="stylesheet" href="../style.css">
 </head>
 
 <body>
+  <div class="speed">Speed: <span id="speed"></span></div>
 </body>
 
 <script type="module">
@@ -81,8 +82,11 @@
     player.spawn( level );
   }
 
+  const speedUI = document.getElementById( 'speed' );
+
   game.update = ( dt ) => {
     player.update( dt, game.keysPressed );
+    speedUI.innerText = player.speed;
 
     light.position.set( 
       player.position.x, 

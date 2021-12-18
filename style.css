@@ -3,3 +3,10 @@ body {
   overscroll-behavior: none; /* Disable Chrome two fingers back/forward swipe */
   user-select: none;  /* Prevent accidental selection while dragging mouse */
 }
+
+.speed {
+  position: absolute;
+  padding: 4px;
+  color: white;
+  font: 18px Arial, san-serif;
+}
