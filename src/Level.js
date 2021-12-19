@@ -52,6 +52,10 @@ export class Level {
     return 0 <= col && col < this.cols && 0 <= row && row < this.rows &&
       this.blocks[ col + row * this.cols ];
   }
+
+  acrossFinishLine( z ) {
+    return z < BLOCK_LENGTH;
+  }
 }
 
 function getMesh( cols, rows, blocks ) {

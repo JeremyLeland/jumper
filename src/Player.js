@@ -109,8 +109,8 @@ export class Player {
       this.position.y = SIZE;
       this.velocity.y = keysPressed.has( ' ' ) ? JUMP_SPEED : 0;
 
-      if ( this.position.z < SIZE ) {
-        this.position.z = SIZE;
+      // TODO: Test this in Level instead?
+      if ( level.acrossFinishLine( this.position.z ) ) {
         this.completedLevel = true;
         titleUI.innerText = 'Level Complete!';
       }
