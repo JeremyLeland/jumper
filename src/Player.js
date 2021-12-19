@@ -1,17 +1,19 @@
 import * as THREE from '../lib/three.module.js';
 
-const SPEED = 0.01
-const MAX_SPEED = 8
-const ACCEL = 0.006
-const SIDE_SPEED = 0.008
-const JUMP_SPEED = 0.02
-const SIZE = 0.4
-const SPAWN_Y = 5.0
-const GRAVITY = -0.0001
-const COLLISION_FUDGE = 0.3
-const FALL_NO_RETURN = -0.4
-const FALL_END = -40
-const DETAIL = 20;
+const SPEED = 0.01;
+const MAX_SPEED = 8;
+const ACCEL = 0.006;
+const SIDE_SPEED = 0.008;
+const JUMP_SPEED = 0.02;
+const SIZE = 0.4;
+const GRAVITY = -0.0001;
+const COLLISION_FUDGE = 0.3;
+const FALL_NO_RETURN = -0.4;
+const FALL_END = -40;
+const DETAIL = 40;
+
+const speedUI = document.getElementById( 'speed' );
+const titleUI = document.getElementById( 'title' );
 
 export class Player {
   mesh = new THREE.Mesh(
@@ -28,6 +30,8 @@ export class Player {
 
   speed = 0;
   #partialSpeed = 0;
+
+  completedLevel = false;
   
   constructor() {
     this.mesh.castShadow = true;
@@ -39,6 +43,9 @@ export class Player {
     this.velocity.set( 0, 0, 0 );
     this.speed = 0;
     this.#partialSpeed = 0;
+    this.completedLevel = false;
+
+    titleUI.innerText = level.title;
   }
 
   update( { dt, level, keysPressed } ) {
@@ -83,6 +90,10 @@ export class Player {
     }
 
     this.velocity.z = -SPEED * this.speed;
+    speedUI.innerText = this.speed;
+    if ( this.speed > 0 ) {
+      titleUI.innerText = '';  
+    }
 
     this.position.addScaledVector( this.velocity, dt );
 
@@ -96,7 +107,13 @@ export class Player {
           )
         ) ) {
       this.position.y = SIZE;
-      this.velocity.y = keysPressed.has( 'Space' ) ? JUMP_SPEED : 0;
+      this.velocity.y = keysPressed.has( ' ' ) ? JUMP_SPEED : 0;
+
+      if ( this.position.z < SIZE ) {
+        this.position.z = SIZE;
+        this.completedLevel = true;
+        titleUI.innerText = 'Level Complete!';
+      }
     }
     else if ( this.position.y < FALL_END ) {
       this.spawn( level );

@@ -8,5 +8,13 @@ body {
   position: absolute;
   padding: 4px;
   color: white;
-  font: 18px Arial, san-serif;
+  font: 18px Arial, sans-serif;
+}
+
+#title {
+  position: absolute;
+  color: white;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  font: 28px Arial, sans-serif;
 }

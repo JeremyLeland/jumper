@@ -1,18 +1,50 @@
 <head>
   <title>Jumper v0.9</title>
-  <link rel="stylesheet" href="../style.css">
+  <link rel='stylesheet' href='../style.css'>
 </head>
 
 <body>
-  <div class="speed">Speed: <span id="speed"></span></div>
+  <div class='speed'>Speed: <span id='speed'></span></div>
+  <div id='title'>Jumper</div>
 </body>
 
-<script type="module">
+<script type='module'>
 
   import * as THREE from '../lib/three.module.js';
   import { ThreeGame } from '../src/ThreeGame.js';
   import { Level } from '../src/Level.js';
   import { Player } from '../src/Player.js';
+
+  
+  
+
+  const ClassicLevels = [
+    { title: "Red", src: "./levels/classic/easy1.png" },
+    { title: "A Colorful Intro", src: "./levels/classic/03.png" },
+    { title: "Yellow", src: "./levels/classic/easy3.png" },
+    { title: "Blue", src: "./levels/classic/easy5.png" },
+    { title: "Thin Ice", src: "./levels/classic/ice.png" },
+    { title: "Green", src: "./levels/classic/easy4.png" },
+    { title: "Purple", src: "./levels/classic/easy6.png" },
+    { title: "Taste the Rainbow", src: "./levels/classic/windy.png" },
+    { title: "Orange", src: "./levels/classic/easy2.png" },
+    { title: "Jump Training", src: "./levels/classic/jump-training.png" },
+    { title: "Islands", src: "./levels/classic/islands.png" },
+    { title: "Ant thing?", src: "./levels/classic/ant-thing.png" },
+    { title: "Fruity", src: "./levels/classic/fruit.png" },
+    { title: "Jumps and Waves", src: "./levels/classic/04.png" },
+    { title: "Taste the Rainbow 2", src: "./levels/classic/rainbow2.png" },
+    { title: "Quicksilver", src: "./levels/classic/quicksilver.png" },
+    { title: "Bombed Road", src: "./levels/classic/road.png" },
+    { title: "Bendy Lines", src: "./levels/classic/lines.png" },
+    { title: "Branches", src: "./levels/classic/tree.png" },
+    { title: "Multi-threading", src: "./levels/classic/threads.png" },
+    { title: "Stepping Stones", src: "./levels/classic/stones.png" },
+    { title: "More Lines", src: "./levels/classic/morelines.png" },
+    { title: "A Different Slant", src: "./levels/classic/slant.png" },
+    { title: "Red Light, Green Light", src: "./levels/classic/stopngo.png" },
+    { title: "Bubbles!", src: "./levels/classic/bubbles.png" },
+  ];
 
   const LEVEL_COLS = 9;
 
@@ -24,9 +56,9 @@
   const LIGHT_FOLLOW_Z = 5;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color( 0x111122 ); 
+  // scene.background = new THREE.Color( 0x111122 ); 
 
-  const light = new THREE.DirectionalLight( 0xffffff );
+  const light = new THREE.DirectionalLight();
 
   //
   // TODO: Figure out how this works, tune as needed
@@ -64,16 +96,45 @@
   game.scene = scene;
 
   let level;
-  await loadLevel( './levels/classic/03.png' );
+  await nextLevel();
 
-  async function loadLevel( src ) {
+  game.start( ( dt ) => {
+    if ( game.keysPressed.has( 'n' ) ) {
+      game.keysPressed.clear();
+      nextLevel();
+    }
+
+    if ( player.completedLevel ) {
+      if ( game.keysPressed.size > 0 ) {
+        game.keysPressed.clear();
+        nextLevel();
+      }
+    }
+    else {
+      player.update( { dt: dt, level: level, keysPressed: game.keysPressed } );
+      
+      light.position.z = player.position.z + LIGHT_FOLLOW_Z;
+      light.target.position.set( light.position.x, 0, player.position.z );
+
+      game.camera.position.z = player.position.z + CAMERA_FOLLOW_Z;
+      game.camera.lookAt( game.camera.position.x, 0, player.position.z + CAMERA_LOOK_Z );
+    }
+  } );
+
+  async function nextLevel() {
+    if ( ClassicLevels.length > 0 ) {
+      await loadLevel( ClassicLevels.shift() );
+    }
+  }
+
+  async function loadLevel( { title = '', src } ) {
     if ( level ) {
       scene.remove( level.mesh );
       level.mesh.geometry.dispose();
       level.mesh.material.dispose();
     }
-    
-    level = await Level.fromImageSrc( src );
+
+    level = await Level.fromImageSrc( title, src );
   
     scene.add( level.mesh );
 
@@ -85,19 +146,6 @@
     game.camera.position.x = player.position.x;
     game.camera.position.y = CAMERA_Y;
   }
-
-  const speedUI = document.getElementById( 'speed' );
-
-  game.start( ( dt ) => {
-    player.update( { dt: dt, level: level, keysPressed: game.keysPressed } );
-    speedUI.innerText = player.speed;
-
-    light.position.z = player.position.z + LIGHT_FOLLOW_Z;
-    light.target.position.set( light.position.x, 0, player.position.z );
-
-    game.camera.position.z = player.position.z + CAMERA_FOLLOW_Z;
-    game.camera.lookAt( game.camera.position.x, 0, player.position.z + CAMERA_LOOK_Z );
-  } );
 
   //
   // Drag and drop to load levels
@@ -114,7 +162,7 @@
           const file = event.dataTransfer.items[ i ].getAsFile();
           const reader = new FileReader();
           reader.onloadend = () => {
-            loadLevel( reader.result );
+            loadLevel( { src: reader.result } );
           };
           reader.readAsDataURL( file );
         }
@@ -122,7 +170,7 @@
     }
     else {
       for ( let i = 0; i < event.dataTransfer.files.length; i ++ ) {
-        loadLevel( event.dataTransfer.files[ i ].name );
+        loadLevel( { src: event.dataTransfer.files[ i ].name } );
       }
     }
   }

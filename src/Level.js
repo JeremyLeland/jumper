@@ -7,6 +7,7 @@ const BLOCK_LENGTH = 2;
 const SPAWN_Y = 5;
 
 export class Level {
+  title;
   cols;
   rows;
   blocks;
@@ -14,16 +15,17 @@ export class Level {
 
   spawnPosition;
 
-  static async fromImageSrc( src ) {
+  static async fromImageSrc( title, src ) {
     const image = new Image();
     image.src = src;
 
     await image.decode();
 
-    return new Level( image );
+    return new Level( title, image );
   }
 
-  constructor( image ) {
+  constructor( title, image ) {
+    this.title = title;
     this.cols = image.width;
     this.rows = image.height;
 

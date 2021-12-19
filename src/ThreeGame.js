@@ -2,7 +2,7 @@ import * as THREE from '../lib/three.module.js';
 
 export class ThreeGame {
   scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 500 );
+  camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 100 );
   renderer = new THREE.WebGLRenderer();
 
   keysPressed = new Set();
@@ -18,8 +18,8 @@ export class ThreeGame {
     }
     window.onresize();
 
-    window.onkeydown = ( e ) => this.keysPressed.add( e.code );
-    window.onkeyup   = ( e ) => this.keysPressed.delete( e.code );
+    window.onkeydown = ( e ) => this.keysPressed.add( e.key );
+    window.onkeyup   = ( e ) => this.keysPressed.delete( e.key );
   }
 
   start( updateFunc ) {
