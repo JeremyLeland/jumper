@@ -15,35 +15,55 @@ export class Level {
 
   spawnPosition;
 
-  static async fromImageSrc( title, src ) {
+  static async fromImageSrc( { title, src } ) {
     const image = new Image();
     image.src = src;
-
     await image.decode();
 
-    return new Level( title, image );
+    return new Level( title, getContextFromImage( image ) );
   }
 
-  constructor( title, image ) {
+  static createRandom() {
+    const canvas = document.createElement( 'canvas' );
+    canvas.width = 9;
+    canvas.height = 200;
+    
+    const ctx = canvas.getContext( '2d' );
+
+    ctx.fillStyle = 'red';
+    ctx.fillRect( 4, canvas.height - 4, 2, 4 );
+
+    for ( let z = canvas.height - 10; 0 < z; z -= 4 ) {
+      ctx.fillStyle = 'red';
+
+      const x = Math.floor( Math.random() * canvas.width );
+      const w = 2 + Math.floor( Math.random() * 4 );
+      const h = 4 + Math.floor( Math.random() * 4 );
+      ctx.fillRect( x, z, w, h );
+
+      z -= h + Math.floor( Math.random() * 2 );
+    }
+
+    return new Level( 'Random', ctx );
+  }
+
+  constructor( title, ctx ) {
     this.title = title;
-    this.cols = image.width;
-    this.rows = image.height;
+    this.cols = ctx.canvas.width;
+    this.rows = ctx.canvas.height;
+
+    this.blocks = getBlocksFromContext( ctx );
+
+    this.mesh = getMesh( this.cols, this.rows, this.blocks );
+    this.mesh.scale.set( BLOCK_WIDTH, BLOCK_HEIGHT, BLOCK_LENGTH );
+    this.mesh.castShadow = false;
+    this.mesh.receiveShadow = true;
 
     this.spawnPosition = new THREE.Vector3(
       ( this.cols / 2 ) * BLOCK_WIDTH, 
       SPAWN_Y, 
       ( this.rows - 0.5 ) * BLOCK_LENGTH
     );
-
-    this.blocks = Array.from( getImageDataBuffer( image ), 
-      color => ( color & 0x00FFFFFF ) == 0 ? null : new THREE.Color( color ) 
-    );
-
-    this.mesh = getMesh( this.cols, this.rows, this.blocks );
-    this.mesh.scale.set( BLOCK_WIDTH, BLOCK_HEIGHT, BLOCK_LENGTH );
-
-    this.mesh.castShadow = false;
-    this.mesh.receiveShadow = true;
   }
 
   isSolidAt( x, z ) {
@@ -144,7 +164,7 @@ function getMesh( cols, rows, blocks ) {
   return new THREE.Mesh( geometry, material );
 }
 
-function getImageDataBuffer( image ) {
+function getContextFromImage( image ) {
   const canvas = document.createElement( 'canvas' );
   canvas.width = image.width;
   canvas.height = image.height;
@@ -152,7 +172,15 @@ function getImageDataBuffer( image ) {
   const ctx = canvas.getContext( '2d' );
   ctx.drawImage( image, 0, 0 );
 
-  return new Uint32Array(
-    ctx.getImageData( 0, 0, canvas.width, canvas.height ).data.buffer
+  return ctx;
+}
+
+function getBlocksFromContext( ctx ) {
+  const buffer = new Uint32Array(
+    ctx.getImageData( 0, 0, ctx.canvas.width, ctx.canvas.height ).data.buffer
+  );
+
+  return Array.from( buffer, 
+    color => ( color & 0x00FFFFFF ) == 0 ? null : new THREE.Color( color )
   );
 }

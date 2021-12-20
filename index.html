@@ -1,6 +1,6 @@
 <head>
   <title>Jumper v0.9</title>
-  <link rel='stylesheet' href='../style.css'>
+  <link rel='stylesheet' href='./style.css'>
 </head>
 
 <body>
@@ -10,13 +10,10 @@
 
 <script type='module'>
 
-  import * as THREE from '../lib/three.module.js';
-  import { ThreeGame } from '../src/ThreeGame.js';
-  import { Level } from '../src/Level.js';
-  import { Player } from '../src/Player.js';
-
-  
-  
+  import * as THREE from './lib/three.module.js';
+  import { ThreeGame } from './src/ThreeGame.js';
+  import { Level } from './src/Level.js';
+  import { Player } from './src/Player.js';
 
   const ClassicLevels = [
     { title: "Red", src: "./levels/classic/easy1.png" },
@@ -65,8 +62,8 @@
   //
   light.castShadow = true;
 
-  light.shadow.camera.left = -3;
-  light.shadow.camera.right = 3;
+  light.shadow.camera.left = -5;
+  light.shadow.camera.right = 5;
   light.shadow.camera.top = 3;
   light.shadow.camera.bottom = -1;
 
@@ -89,7 +86,8 @@
   game.scene = scene;
 
   let level;
-  await nextLevel();
+  //await nextLevel();
+  setLevel( Level.createRandom() );
 
   game.start( ( dt ) => {
     if ( game.keysPressed.has( 'n' ) ) {
@@ -116,21 +114,20 @@
 
   async function nextLevel() {
     if ( ClassicLevels.length > 0 ) {
-      await loadLevel( ClassicLevels.shift() );
+      setLevel( await Level.fromImageSrc( ClassicLevels.shift() ) );
     }
   }
 
-  async function loadLevel( { title = '', src } ) {
+  function setLevel( newLevel ) {
     if ( level ) {
       scene.remove( level.mesh );
       level.mesh.geometry.dispose();
       level.mesh.material.dispose();
     }
 
-    level = await Level.fromImageSrc( title, src );
-  
-    scene.add( level.mesh );
+    level = newLevel;
 
+    scene.add( level.mesh );
     player.spawn( level );
 
     light.position.x = player.position.x;
@@ -155,7 +152,7 @@
           const file = event.dataTransfer.items[ i ].getAsFile();
           const reader = new FileReader();
           reader.onloadend = () => {
-            loadLevel( { src: reader.result } );
+            setLevel( { src: reader.result } );
           };
           reader.readAsDataURL( file );
         }
@@ -163,7 +160,7 @@
     }
     else {
       for ( let i = 0; i < event.dataTransfer.files.length; i ++ ) {
-        loadLevel( { src: event.dataTransfer.files[ i ].name } );
+        setLevel( { src: event.dataTransfer.files[ i ].name } );
       }
     }
   }
