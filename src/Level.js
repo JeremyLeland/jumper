@@ -15,15 +15,7 @@ export class Level {
 
   spawnPosition;
 
-  static async fromImageSrc( { title, src } ) {
-    const image = new Image();
-    image.src = src;
-    await image.decode();
-
-    return new Level( title, getContextFromImage( image ) );
-  }
-
-  static createRandom() {
+  static createRandomContext() {
     const canvas = document.createElement( 'canvas' );
     canvas.width = 9;
     canvas.height = 200;
@@ -42,7 +34,15 @@ export class Level {
       ctx.fillRect( x, z, w, h );
     }
 
-    return new Level( 'Random', ctx );
+    return ctx;
+  }
+
+  static async fromImageSrc( { title, src } ) {
+    const image = new Image();
+    image.src = src;
+    await image.decode();
+
+    return new Level( title, getContextFromImage( image ) );
   }
 
   constructor( title, ctx ) {

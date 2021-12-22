@@ -87,12 +87,17 @@
 
   let level;
   //await nextLevel();
-  setLevel( Level.createRandom() );
+  randomLevel();
 
   game.start( ( dt ) => {
     if ( game.keysPressed.has( 'n' ) ) {
       game.keysPressed.clear();
       nextLevel();
+    }
+
+    if ( game.keysPressed.has( 'r' ) ) {
+      game.keysPressed.clear();
+      randomLevel();
     }
 
     if ( player.completedLevel ) {
@@ -116,6 +121,10 @@
     if ( ClassicLevels.length > 0 ) {
       setLevel( await Level.fromImageSrc( ClassicLevels.shift() ) );
     }
+  }
+
+  function randomLevel() {
+    setLevel( new Level( 'Random', Level.createRandomContext() ) );
   }
 
   function setLevel( newLevel ) {
