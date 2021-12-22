@@ -30,18 +30,16 @@ export class Level {
     
     const ctx = canvas.getContext( '2d' );
 
-    ctx.fillStyle = 'red';
+    ctx.fillStyle = ctx.fillStyle = randColor();
     ctx.fillRect( 4, canvas.height - 4, 2, 4 );
 
-    for ( let z = canvas.height - 10; 0 < z; z -= 4 ) {
-      ctx.fillStyle = 'red';
+    for ( let z = 0; z < canvas.height; z += 8 ) {
+      ctx.fillStyle = randColor();
 
-      const x = Math.floor( Math.random() * canvas.width );
-      const w = 2 + Math.floor( Math.random() * 4 );
-      const h = 4 + Math.floor( Math.random() * 4 );
+      const x = Math.floor( 0.5 * ( 1 + Math.sin( z * 0.1 ) ) * canvas.width );
+      const w = 2 + Math.floor( Math.random() * 2 );
+      const h = 5 + Math.floor( Math.random() * 2 );
       ctx.fillRect( x, z, w, h );
-
-      z -= h + Math.floor( Math.random() * 2 );
     }
 
     return new Level( 'Random', ctx );
@@ -76,6 +74,10 @@ export class Level {
   acrossFinishLine( z ) {
     return z < BLOCK_LENGTH;
   }
+}
+
+function randColor() {
+  return `hsl( ${ Math.random() * 360 }, ${ 25 + Math.random() * 50 }%, 50%)`;
 }
 
 function getMesh( cols, rows, blocks ) {
