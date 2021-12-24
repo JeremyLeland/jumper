@@ -22,16 +22,17 @@ export class Level {
     
     const ctx = canvas.getContext( '2d' );
 
-    ctx.fillStyle = ctx.fillStyle = randColor();
-    ctx.fillRect( 4, canvas.height - 4, 2, 4 );
-
-    for ( let z = 0; z < canvas.height; z += 8 ) {
+    for ( let x = 4, z = canvas.height - 1;
+          z > 0;
+          x = Math.max( 0, Math.min( canvas.width - 2, 
+            Math.floor( x + Math.sin( ( z + Math.random() ) * 10 ) * 3 ) 
+          ) ), 
+          z -= 8 ) {
       ctx.fillStyle = randColor();
 
-      const x = Math.floor( 0.5 * ( 1 + Math.sin( z * 0.1 ) ) * canvas.width );
       const w = 2 + Math.floor( Math.random() * 2 );
       const h = 5 + Math.floor( Math.random() * 2 );
-      ctx.fillRect( x, z, w, h );
+      ctx.fillRect( x, z, w, -h );
     }
 
     return ctx;
