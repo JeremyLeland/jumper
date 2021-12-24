@@ -22,7 +22,7 @@ export class Level {
     
     const ctx = canvas.getContext( '2d' );
 
-    for ( let x = 4, z = canvas.height - 1;
+    for ( let x = 4, z = canvas.height;
           z > 0;
           x = Math.max( 0, Math.min( canvas.width - 2, 
             Math.floor( x + Math.sin( ( z + Math.random() ) * 10 ) * 3 ) 
