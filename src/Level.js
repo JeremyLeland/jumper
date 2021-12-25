@@ -24,7 +24,7 @@ export class Level {
 
     const mid = canvas.width / 2;
     const amp = canvas.width / 2;
-    const gap = 4;
+    const gap = 5;
 
     ctx.translate( 0, canvas.height );
 
@@ -43,6 +43,7 @@ export class Level {
       
       ctx.translate( 0, -h );
 
+      // TODO: Rotate hue based on index, and have sat/lum be random?
       ctx.fillStyle = randColor();
       
       ctx.save();
@@ -101,7 +102,7 @@ export class Level {
 }
 
 function randColor() {
-  return `hsl( ${ Math.random() * 360 }, ${ 25 + Math.random() * 50 }%, 50%)`;
+  return `hsl( ${ Math.random() * 360 }, ${ 15 + Math.random() * 70 }%, ${ 25 + Math.random() * 75 }% )`;
 }
 
 function getMesh( cols, rows, blocks ) {
