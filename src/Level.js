@@ -24,22 +24,24 @@ export class Level {
 
     const mid = canvas.width / 2;
     const amp = canvas.width / 2;
+    const gap = 4;
 
-    // TODO: Use translates so we can do other shapes more easily
-    //       Do a for loop from 0 to whatever and sin() based on that (so we start centered)
-    ctx.translate( 0, canvas.height - 1 );
+    ctx.translate( 0, canvas.height );
 
     const rect = new Path2D( 'M -1,-1 L 1,-1 L 1,1 L -1,1 Z' );
 
-    for ( let i = 0; i < 20; i ++ ) {
+    for ( let i = Math.random() < 0.5 ? 0 : Math.PI,
+              z = canvas.height;
+          z > 0;
+          i += Math.random() ) {
       
-      const x = Math.round( mid + Math.sin( i ) * amp );
+      const x = Math.round( mid + Math.sin( i ) * Math.random() * amp );
       
-      const w = 1; // + Math.floor( Math.random() * 2 );
-      const h = Math.ceil( Math.random() * 4 );
+      const w = Math.ceil( Math.random() * 2 );
+      const h = z < 15 ? z * 2 : 1 + Math.ceil( Math.random() * 4 );
       
       
-      ctx.translate( 0, -2 * h - 2 );
+      ctx.translate( 0, -h );
 
       ctx.fillStyle = randColor();
       
@@ -50,6 +52,10 @@ export class Level {
       ctx.fill( rect );
 
       ctx.restore();
+
+      ctx.translate( 0, -h - gap );
+
+      z -= 2 * h + gap;
     }
 
     return ctx;
