@@ -16,6 +16,16 @@ body {
   position: absolute;
   color: white;
   left: 50%; top: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate( -50%, -50% );
   font: 28px Arial, sans-serif;
+}
+
+#instructions {
+  position: absolute;
+  display: inline-block;
+  color: white;
+  left: 50%; bottom: 0%;
+  transform: translate( -50%, -50% );
+  font: 10px Arial, sans-serif;
+  
 }

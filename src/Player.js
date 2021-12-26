@@ -14,6 +14,7 @@ const DETAIL = 40;
 
 const speedUI = document.getElementById( 'speed' );
 const titleUI = document.getElementById( 'title' );
+const instructionsUI = document.getElementById( 'instructions' );
 
 export class Player {
   mesh = new THREE.Mesh(
@@ -46,6 +47,7 @@ export class Player {
     this.completedLevel = false;
 
     titleUI.innerText = level.title;
+    instructionsUI.style.visibility = 'visible';
   }
 
   update( { dt, level, keysPressed } ) {
@@ -92,7 +94,8 @@ export class Player {
     this.velocity.z = -SPEED * this.speed;
     speedUI.innerText = this.speed;
     if ( this.speed > 0 ) {
-      titleUI.innerText = '';  
+      titleUI.innerText = '';
+      instructionsUI.style.visibility = 'hidden';
     }
 
     this.position.addScaledVector( this.velocity, dt );
