@@ -2,30 +2,46 @@ body {
   margin: 0;
   overscroll-behavior: none; /* Disable Chrome two fingers back/forward swipe */
   user-select: none;  /* Prevent accidental selection while dragging mouse */
+  
   background-color: black;
+  color: white;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
 }
 
 .speed {
   position: absolute;
   padding: 4px;
-  color: white;
   font: 18px Arial, sans-serif;
 }
 
 #title {
   position: absolute;
-  color: white;
-  left: 50%; top: 50%;
-  transform: translate( -50%, -50% );
+  top: 50%;
+  transform: translate( 0%, -50% );
   font: 28px Arial, sans-serif;
 }
 
 #instructions {
   position: absolute;
-  display: inline-block;
-  color: white;
-  left: 50%; bottom: 0%;
-  transform: translate( -50%, -50% );
+  display: inline;
+  bottom: 0%;
   font: 10px Arial, sans-serif;
-  
+}
+
+.key {
+  display: inline-block;
+  min-width: 15px;
+  border: 3px outset gray;
+  background: gray;
+  color: white;
+  font-family: monospace;
+  text-align: center;
+}
+
+.action {
+  padding: 0px 20px 0px 10px;
 }
