@@ -18,7 +18,7 @@ export class Level {
   static createRandomContext() {
     const canvas = document.createElement( 'canvas' );
     canvas.width = 9;
-    canvas.height = 200;
+    canvas.height = 300;
     
     const ctx = canvas.getContext( '2d' );
 
@@ -31,20 +31,19 @@ export class Level {
     const rect = new Path2D( 'M -1,-1 L 1,-1 L 1,1 L -1,1 Z' );
 
     for ( let i = Math.random() < 0.5 ? 0 : Math.PI,
+              hue = Math.random() * 360,
               z = canvas.height;
           z > 0;
-          i += Math.random() ) {
+          i += Math.random(),
+          hue += Math.random() * 10 ) {
       
       const x = Math.round( mid + Math.sin( i ) * Math.random() * amp );
-      
       const w = Math.ceil( Math.random() * 2 );
       const h = z < 15 ? z * 2 : 1 + Math.ceil( Math.random() * 4 );
       
-      
       ctx.translate( 0, -h );
 
-      // TODO: Rotate hue based on index, and have sat/lum be random?
-      ctx.fillStyle = randColor();
+      ctx.fillStyle = `hsl( ${ hue }, ${ 15 + Math.random() * 60 }%, ${ 15 + Math.random() * 75 }% )`;
       
       ctx.save();
       ctx.translate( x, 0 );
@@ -99,10 +98,6 @@ export class Level {
   acrossFinishLine( z ) {
     return z < BLOCK_LENGTH;
   }
-}
-
-function randColor() {
-  return `hsl( ${ Math.random() * 360 }, ${ 15 + Math.random() * 70 }%, ${ 25 + Math.random() * 75 }% )`;
 }
 
 function getMesh( cols, rows, blocks ) {
