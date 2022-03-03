@@ -112,6 +112,7 @@
 
     if ( player.completedLevel ) {
       if ( game.keysPressed.size > 0 ) {
+        player.completedLevel = false;
         game.keysPressed.clear();
         nextLevel();
       }
